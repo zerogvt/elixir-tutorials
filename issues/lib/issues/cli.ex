@@ -21,7 +21,16 @@ def process({user, project, count}) do
   |> decode_response()
   |> sort_into_descending_order()
   |> last(count)
-  |> IO.inspect()
+  |> print_table_cols(["number", "created_at", "title"])
+end
+
+def print_table_cols(list_of_issues, fields) do
+  IO.puts "#  | created_at         | title"
+  IO.puts "---+--------------------+-------"
+  list_of_issues
+  |> Enum.map(fn issue -> {issue["number"], issue["created_at"], issue["title"]} end)
+  |> Enum.map_join("\n", &(elem(&1,1)))
+  |> IO.puts()
 end
 
 def last(list, count) do
