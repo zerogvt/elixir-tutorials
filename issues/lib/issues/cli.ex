@@ -21,6 +21,7 @@ def process({user, project, count}) do
   |> decode_response()
   |> sort_into_descending_order()
   |> last(count)
+  |> IO.inspect()
 end
 
 def last(list, count) do
