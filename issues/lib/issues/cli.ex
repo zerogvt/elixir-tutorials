@@ -29,7 +29,8 @@ def print_table_cols(list_of_issues, fields) do
   IO.puts "---+--------------------+-------"
   list_of_issues
   |> Enum.map(fn issue -> {issue["number"], issue["created_at"], issue["title"]} end)
-  |> Enum.map_join("\n", &(elem(&1,1)))
+  |> Enum.map(&(elem(&1,0) <> " | " <> elem(&1,1) <> " | " <> elem(&1,2)))
+  |> Enum.map_join("\n")
   |> IO.puts()
 end
 
