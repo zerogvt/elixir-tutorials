@@ -24,14 +24,61 @@ def process({user, project, count}) do
   |> print_table_cols(["number", "created_at", "title"])
 end
 
-def print_table_cols(list_of_issues, fields) do
-  IO.puts "#  | created_at         | title"
-  IO.puts "---+--------------------+-------"
+def my_print_table_cols(list_of_issues, fields) do
   list_of_issues
   |> Enum.map(fn issue -> {issue["number"], issue["created_at"], issue["title"]} end)
-  |> Enum.map(&(elem(&1,0) <> " | " <> elem(&1,1) <> " | " <> elem(&1,2)))
-  |> Enum.map_join("\n")
+  |> Enum.map( &( printable(elem(&1,0)) <> " | " <> printable(elem(&1,1)) <> " | " <> printable(elem(&1,2)) <> "\n") )
   |> IO.puts()
+end
+
+def print_table_cols(list_of_issues, headers) do
+  with data_by_cols = split_into_cols(list_of_issues, headers),
+       col_widths = widths_of(data_by_cols),
+       format = format_for(col_widths)
+  do
+    puts_one_line_in_columns(headers, format)
+    IO.puts(separator(col_widths))
+    puts_in_columns(data_by_cols, format)
+  end
+end
+
+def format_for(col_widths) do
+  Enum.map_join(col_widths, "|", fn width -> "~-#{width}s" end) <> "~n"
+end
+
+def separator(col_widths) do
+  Enum.map_join(col_widths, "+", fn width -> List.duplicate("-", width) end)
+end
+
+def puts_one_line_in_columns(fields, format) do
+  :io.format(format, fields)
+end
+
+def puts_in_columns(data_by_cols, format) do
+  data_by_cols
+  |> List.zip
+  |> Enum.map(&Tuple.to_list/1)
+  |> Enum.each(&(:io.format(format, &1)))
+end
+
+def split_into_cols(rows, headers) do
+  for header <- headers do
+    for row <- rows, do: printable(row[header])
+  end
+end
+
+def widths_of(columns) do
+  for col <- columns, do: col |> Enum.map(&String.length/1) |> Enum.max
+end
+
+def printable(str) when is_binary(str), do: Kernel.inspect(str)
+def printable(str), do: to_string(str)
+
+def max_string(list_of_issues, field) do
+  list_of_issues
+  |> Enum.map(fn issue -> String.length(Kernel.inspect(issue[field])) end)
+  |> IO.inspect(charlists: :as_lists)
+  |> Enum.max()
 end
 
 def last(list, count) do
