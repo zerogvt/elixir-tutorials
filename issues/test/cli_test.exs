@@ -1,8 +1,7 @@
 defmodule CliTest do
   use ExUnit.Case
   doctest Issues
-  import Issues.CLI, only: [parse_args: 1,
-                            sort_into_descending_order: 1]
+  import Issues.CLI, only: [parse_args: 1, sort_into_descending_order: 1]
 
   test ":help ret by option parsing with -h and --help options" do
     assert parse_args(["-h", "anything"]) == :help
@@ -22,6 +21,7 @@ defmodule CliTest do
     issues = for issue <- res, do: Map.get(issue, "created_at")
     assert issues == ~w{ c b a }
   end
+
   defp fake_list(values) do
     for val <- values, do: %{"created_at" => val, "other_data" => "xxx"}
   end
